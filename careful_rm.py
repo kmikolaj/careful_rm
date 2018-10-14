@@ -59,7 +59,7 @@ import os
 import sys
 import signal
 import shlex as sh
-from glob import glob
+from glob import glob, escape
 from getpass import getuser
 from platform import system
 from datetime import datetime as dt
@@ -625,7 +625,7 @@ def main(argv=None):
             # Everything after this is a file
             file_sep = '--'
             all_files += [
-                i for l in [glob(n) for n in argv[argv.index(arg):]] \
+                i for l in [glob(escape(n)) for n in argv[argv.index(arg):]] \
                 for i in l
             ]
             break
@@ -633,7 +633,7 @@ def main(argv=None):
             # Read files in from STDIN
             all_files += [
                 i for l in \
-                [glob(n) for n in sys.stdin.read().strip().split()] \
+                [glob(escape(n)) for n in sys.stdin.read().strip().split()] \
                 for i in l
             ]
         elif arg.startswith('-'):
@@ -656,7 +656,7 @@ def main(argv=None):
                 shred_args.append('-v')
             flags.append(quote(arg))
         else:
-            all_files += glob(arg)
+            all_files += glob(escape(arg))
     if shred and (recycle or recycle_hm):
         sys.stderr.write('Recycle disabled because shred is in use\n')
         recycle = False
