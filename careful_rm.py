@@ -58,8 +58,9 @@ This tool should ideally be aliased to rm, add this to your bashrc/zshrc:
 import os
 import sys
 import signal
+import re
 import shlex as sh
-from glob import glob, escape
+from glob import glob
 from getpass import getuser
 from platform import system
 from datetime import datetime as dt
@@ -164,6 +165,21 @@ def check_output(cmd, shell=False):
     """Return STDOUT for cmd."""
     _, stdout, _ = run(cmd, shell=shell, check=True, get=True)
     return stdout
+
+
+def escape(pathname):
+    """Escape all special characters.
+    """
+    # Escaping is done by wrapping any of "*?[" between square brackets.
+    # Metacharacters do not work in the drive part and shouldn't be escaped.
+    magic_check = re.compile('([*?[])')
+    magic_check_bytes = re.compile(b'([*?[])')
+    drive, pathname = os.path.splitdrive(pathname)
+    if isinstance(pathname, bytes):
+        pathname = magic_check_bytes.sub(br'[\1]', pathname)
+    else:
+        pathname = magic_check.sub(r'[\1]', pathname)
+    return drive + pathname
 
 
 ###############################################################################
