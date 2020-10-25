@@ -365,7 +365,11 @@ def get_trash(fl=None):
             fl = sys.argv[1]
         else:
             fl = os.path.curdir
-    fl = os.path.abspath(fl)
+
+    try:
+        fl = os.path.abspath(fl)
+    except (FileNotFoundError):
+        fl = '/'
 
     # First check if we are HOME, if not, get mount-based location
     if fl.startswith(HOME):
